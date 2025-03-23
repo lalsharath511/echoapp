@@ -1,7 +1,3 @@
-Sure! Here's the updated guide with information about the `settings.py` file and how to modify MongoDB database details such as the connection URL, database name, and collection names:
-
----
-
 # Echo Flask App Setup Guide
 
 This document outlines how to set up and run the Echo Flask app.
