@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>File Upload and Processing</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #4CAF50;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      background-color: #f9f9f9;
+      width: 70%;
+    }
+
+    input[type="submit"], button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    input[type="submit"]:hover, button:hover {
+      background-color: #45a049;
+    }
+
+    p {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    p.error {
+      color: #ff4d4d;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: 0;
+      height: 1px;
+      background: #ccc;
+    }
+
+    /* Download Button */
+    .download {
+      background-color: #008CBA;
+    }
+
+    .download:hover {
+      background-color: #0077a3;
+    }
+
+    /* Run Process Button */
+    #processButton {
+      background-color: #ff6f61;
+    }
+
+    #processButton:hover {
+      background-color: #ff4a3d;
+    }
+
+    #processButton:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .status-message {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .status-message.loading {
+      color: #008CBA;
+    }
+
+    .status-message.success {
+      color: #4CAF50;
+    }
+
+    .status-message.error {
+      color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>File Upload and Processing</h1>
+    
+    <form method="post" enctype="multipart/form-data" action="/">
+      <input type="file" name="file" accept=".xlsx, .csv">
+      <input type="submit" value="Upload and Process">
+    </form>
+    
+    {% if result %}
+      <p>{{ result }}</p>
+    {% endif %}
+    
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <hr>
+
+    {% if download_link %}
+      <button class="download" onclick="downloadFile()">Download Data</button>
+    {% endif %}
+
+    <div class="status-message" id="statusMessage"></div>
+    <button id="processButton" onclick="runProcess()">Run Process</button>
+  </div>
+
+  <script>
+    async function runProcess() {
+      const button = document.getElementById('processButton');
+      const statusMessage = document.getElementById('statusMessage');
+
+      button.disabled = true;
+      statusMessage.textContent = "Processing...";
+      statusMessage.className = "status-message loading";
+
+      try {
+        const response = await fetch('/run_process', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const data = await response.json();
+
+        if (data.status === "success") {
+          statusMessage.textContent = data.message;
+          statusMessage.className = "status-message success";
+        } else {
+          statusMessage.textContent = data.message;
+          statusMessage.className = "status-message error";
+        }
+      } catch (error) {
+        statusMessage.textContent = "An error occurred. Please try again.";
+        statusMessage.className = "status-message error";
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function downloadFile() {
+      try {
+          const response = await fetch('/download_data');
+  
+          if (!response.ok) {
+              throw new Error("Server responded with " + response.status);
+          }
+  
+          const jsonResponse = await response.json();
+  
+          if (jsonResponse.error) {
+              alert("❌ Error: " + jsonResponse.error);
+          } else {
+              alert("✅ File has been saved on your Desktop! Open the folder manually.");
+          }
+      } catch (error) {
+          alert("❌ Error: " + error.message);
+      }
+  }
+  
+  </script>
+</body>
+</html>
