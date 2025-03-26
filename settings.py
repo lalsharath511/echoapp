@@ -56,7 +56,7 @@ PHANTOM_BUSTER = [
 #####################DATABASE######################
 
 
-CONNECTION_URL="mongodb+srv://cazecho:aILsuWetFGUOcsO0@cluster0.var9lhv.mongodb.net/"
+CONNECTION_URL=""
 DATABASE_NAME="itcCorporate_new"
 COLLECTION_POST="posts"
 COLLECTION_UPLOAD="uploaded_data"
